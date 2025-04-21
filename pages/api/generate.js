@@ -14,11 +14,10 @@ export default async function handler(req, res) {
       model: 'stabilityai/stable-diffusion-xl-base-1.0',
       inputs: prompt,
       parameters: {
-	num_interface_steps: 30,
-	guidance_scale: 7.5,
+	num_interface_steps: 50,
+	guidance_scale: 5,
         height: 1024,
-        width: 1024,
-	seed: Math.floor(Math.random() * 1000000)
+        width: 1024
       }
     })
     

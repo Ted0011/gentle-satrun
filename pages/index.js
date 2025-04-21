@@ -5,26 +5,38 @@ export default function Home() {
   const [image, setImage] = useState(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [generationStatus, setGenerationStatus] = useState('');
+  const [parameters, setParameters] = useState({
+    steps: 20,
+    guidance: 7
+  });
 
   const generateImage = async (isRegenerate = false) => {
     if (!prompt && !isRegenerate) return;
     
     setGenerationStatus('✨ Generating your masterpiece...');
     setIsGenerating(true);
-    setImage(null); // Clear previous image
-    
+    setImage(null);
+
     try {
+      // Increment parameters if regenerating
+      const currentParams = isRegenerate ? {
+        steps: parameters.steps + 1,
+        guidance: parameters.guidance + 1
+      } : parameters;
+
       const response = await fetch('/api/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
-          prompt: isRegenerate ? prompt : prompt 
+          prompt,
+          parameters: currentParams
         })
       });
       
       const data = await response.json();
       setImage(`data:image/png;base64,${data.image}`);
-      setGenerationStatus('🎉 Generation complete!');
+      setParameters(data.parameters || parameters);
+      setGenerationStatus(`🎉 Generation complete! (Steps: ${data.parameters?.steps}, Guidance: ${data.parameters?.guidance})`);
     } catch (error) {
       console.error(error);
       setGenerationStatus('❌ Error generating image');
@@ -71,12 +83,17 @@ export default function Home() {
         <div className="result-container">
           <img src={image} alt="Generated from AI" className="generated-image" />
           
+          <div className="parameter-display">
+            <span>Steps: {parameters.steps}</span>
+            <span>Guidance: {parameters.guidance}</span>
+          </div>
+          
           <div className="action-buttons">
             <button 
               onClick={() => generateImage(true)}
               className="regenerate-btn"
             >
-              🔄 Regenerate
+              🔄 Regenerate (+1 to params)
             </button>
             <button 
               onClick={() => {

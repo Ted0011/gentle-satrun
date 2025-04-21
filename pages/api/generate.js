@@ -1,3 +1,4 @@
+// pages/api/generate.js
 import { HfInference } from '@huggingface/inference';
 
 const hf = new HfInference(process.env.HF_API_KEY);
@@ -8,16 +9,17 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { prompt } = req.body;
+    const { prompt, parameters } = req.body;
     
-    // Optimized for faster generation
     const response = await hf.textToImage({
       model: 'stabilityai/stable-diffusion-xl-base-1.0',
       inputs: prompt,
       parameters: {
-	negative_prompt: "blurry, low quality",
-	height: 768,
-        width: 768
+        num_inference_steps: parameters?.steps || 20,
+        guidance_scale: parameters?.guidance || 7,
+        height: 768,
+        width: 768,
+        seed: Math.floor(Math.random() * 1000000)
       }
     });
     
@@ -26,16 +28,13 @@ export default async function handler(req, res) {
     
     res.status(200).json({ 
       image: base64,
-      model: 'SDXL 1.0',
-      steps: 20,
-      resolution: '768x768'
+      parameters: {
+        steps: parameters?.steps || 20,
+        guidance: parameters?.guidance || 7
+      }
     });
   } catch (error) {
     console.error('Generation error:', error);
-    res.status(500).json({ 
-      message: 'Error generating image',
-      error: error.message,
-      suggestion: 'Try a simpler prompt or wait a few moments'
-    });
+    res.status(500).json({ error: error.message });
   }
 }

@@ -11,11 +11,14 @@ export default async function handler(req, res) {
     const { prompt } = req.body
     
     const response = await hf.textToImage({
-      model: 'Jovie/Midjourney',
+      model: 'stabilityai/stable-diffusion-xl-base-1.0',
       inputs: prompt,
       parameters: {
-        height: 512,
-        width: 512
+	num_interface_steps: 30,
+	guidance_scale: 7.5,
+        height: 1024,
+        width: 1024,
+	seed: Math.floor(Math.random() * 1000000)
       }
     })
     

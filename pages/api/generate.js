@@ -11,10 +11,9 @@ export default async function handler(req, res) {
     const { prompt } = req.body
     
     const response = await hf.textToImage({
-      model: 'stabilityai/stable-diffusion-xl-base-1.0',
+      model: 'Jovie/Midjourney',
       inputs: prompt,
       parameters: {
-        negative_prompt: 'blurry, low quality',
         height: 512,
         width: 512
       }

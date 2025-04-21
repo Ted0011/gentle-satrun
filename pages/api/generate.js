@@ -15,9 +15,8 @@ export default async function handler(req, res) {
       model: 'stabilityai/stable-diffusion-xl-base-1.0',
       inputs: prompt,
       parameters: {
-        num_inference_steps: 2,
-        guidance_scale: 2,
-        height: 768,
+	negative_prompt: "blurry, low quality",
+	height: 768,
         width: 768
       }
     });
